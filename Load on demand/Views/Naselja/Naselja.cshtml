@@ -1,0 +1,129 @@
+﻿@model IEnumerable<Load_on_demand.Models.NaseljeModel>
+@{
+    ViewData["Title"] = "Naselja";
+}
+
+<script>
+    function dataLoad(drzava) {
+    if ($("#op1") != "") {
+        $("#op1").empty();
+    }
+    var NaseljeModel = {
+        'Država': drzava
+    };
+    $.ajax({
+        url: '@Url.Action("GetData", "Naselja")',
+        datatype: "JSON",
+        data: NaseljeModel,
+        type: "Get",
+        success: function (data) {
+            debugger;
+            for (var i = 0; i < data.length; i++) {
+                var opt = new Option(data[i].država);
+                $("#op1").append(opt);
+            }
+            $("#op1").focus();
+        }
+    });
+}
+</script>
+
+<script id="dodaj/edit" type="text/html">
+    <form method="post" class="form-container">
+        <table class="table">
+            <thead>
+                <tr class="text-center">
+                    <th>@Html.DisplayNameFor(model => model.Država)</th>
+                    <th>@Html.DisplayNameFor(model => model.PoštanskiBroj)</th>
+                    <th>@Html.DisplayNameFor(model => model.NazivNaselja)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="text-center">
+                    <th>
+                        <input list="op1" onkeyup="dataLoad(this.value)" id="Država" asp-for="First().Država" required>
+                        <datalist id="op1" asp-for="First().Država">
+                        </datalist>
+                    </th>
+                    <th><input id="PoštanskiBroj" asp-for="First().PoštanskiBroj" value="" required /></th>
+                    <th><input id="NazivDržave" asp-for="First().NazivNaselja" value="" required /></th>
+                </tr>
+            </tbody>
+        </table>
+        <input id="IDnaselja" asp-for="First().IDnaselja" value="" style="display:none;" />
+        <button type="submit" class="btn">Spremi</button>
+    </form>
+</script>
+
+
+
+<div class="text-center">
+    <h2>@ViewData["Title"]</h2>
+</div>
+<div>
+    <div>
+        <table class="table" id="data_pagination_naselja">
+            <thead>
+                <tr class="text-center">
+                    <th>@Html.DisplayNameFor(model => model.Država)</th>
+                    <th>@Html.DisplayNameFor(model => model.PoštanskiBroj)</th>
+                    <th>@Html.DisplayNameFor(model => model.NazivNaselja)</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            @{ int counter = 0;
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        counter++;
+
+                        <tr class="text-center">
+                            <th><p id="Država @item.IDnaselja">@Html.DisplayFor(modelItem => item.Država)</p></th>
+                            <th><p id="Poštanski @item.IDnaselja">@Html.DisplayFor(modelItem => item.PoštanskiBroj)</p></th>
+                            <th><p id="Naziv @item.IDnaselja">@Html.DisplayFor(modelItem => item.NazivNaselja)</p></th>
+                            <th>
+                                <a id="@item.IDnaselja" onclick="popupEdit(@item.IDnaselja)" class="alert-link" style="cursor:pointer; color:dodgerblue">Edit</a> |
+                                <a asp-action="ObrišiNaselje" asp-route-IDnaselja="@item.IDnaselja" class="alert-link">Obriši</a>
+                            </th>
+                        </tr>
+                    }
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th colspan="2" style="text-align:center">Broj naselja: @counter</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+    <!-- Pagination call code goes here-->
+    <script>
+        $(document).ready(createPagination("data_pagination_naselja", "nav_naselja"));
+    </script>
+
+
+    <div>
+        <button id="myBtn" onclick="popup()">Dodaj naselje</button>
+        <div id="myModal" class="modal">
+            <div class="modal-content" id="mod-content">
+                <span class="close">&times;</span>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+        $(document).ready(loadForm());
+</script>
+
+
+</div>
+<script>
+
+</script>
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
